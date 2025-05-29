@@ -46,5 +46,7 @@ En tirant parti de la mémoire longue de la volatilité, de l’hétéroscédast
 ---
 
 ## Résultats 
+On obtient bien des résultats légèrement meilleurs, mais similaires au modèles HAR-RC et LSTM:
+![Figure_3](https://github.com/user-attachments/assets/967d167f-2f2b-4ca2-9528-b8736212f290)
 
 ---
