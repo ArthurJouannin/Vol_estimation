@@ -50,7 +50,7 @@ class Vol:
     def fit_garch(self):
         returns_clean = self.returns.dropna() * 10000  
         self.garch = arch_model(returns_clean, vol='Garch', p=1, q=1, rescale=False)
-            self.garch_fit = self.garch.fit(disp='off')
+        self.garch_fit = self.garch.fit(disp='off')
         self.garch_volatility = self.garch_fit.conditional_volatility / 10000 * np.sqrt(252)
                 
     def lstm_data(self):
