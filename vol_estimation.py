@@ -81,7 +81,7 @@ class Vol:
         y_train, y_val = self.y_lstm[:split_idx], self.y_lstm[split_idx:]
         if len(X_val) == 0:
             X_val, y_val = X_train, y_train
-        epochs = min(50, max(10, len(X_train) // 5))
+        epochs = min(10, max(10, len(X_train) // 5))
         self.lstm.fit(X_train, y_train, epochs=epochs, batch_size=min(32, max(1, len(X_train) // 10)), validation_data=(X_val, y_val), verbose=1)
 
     def fits(self):
@@ -134,7 +134,7 @@ class Vol:
         return pd.DataFrame(results).T
         
     def plot(self, figsize=(15, 10)):
-        fig, axes = plt.subplots(2, 2, figsize=figsize)
+        fig, axes = plt.subplots(4, 2, figsize=figsize)
         fig.suptitle('Prévisions de Volatilité', fontsize=16)
         x = range(len(self.y))
         
@@ -142,21 +142,45 @@ class Vol:
         axes[0,0].plot(x, self.indiv_predictions['HAR'], label='HAR-RV')
         axes[0,0].set_title('Modèle HAR-RV')
         axes[0,0].legend()
-        
-        axes[0,1].plot(x, self.y, label='RV')
-        axes[0,1].plot(x, self.indiv_predictions['GARCH'], label='GARCH')
-        axes[0,1].set_title('Modèle GARCH')
+
+        résidus_HAR = (self.indiv_predictions['HAR'] - self.y)
+        tot_HAR = sum(abs(résidus_HAR))
+        axes[0,1].plot(x, résidus_HAR, label=f'Résidus totaux: {tot_HAR}')        
+        axes[0,1].set_title('Résidus modèle HAR-RV')
         axes[0,1].legend()
         
         axes[1,0].plot(x, self.y, label='RV')
-        axes[1,0].plot(x, self.indiv_predictions['LSTM'], label='LSTM')
-        axes[1,0].set_title('Modèle LSTM')
+        axes[1,0].plot(x, self.indiv_predictions['GARCH'], label='GARCH')
+        axes[1,0].set_title('Modèle GARCH')
         axes[1,0].legend()
         
-        axes[1,1].plot(x, self.y, label='RV')
-        axes[1,1].plot(x, self.predictions, label='Modèle d\'Ensemble')
-        axes[1,1].set_title('Modèle d\'Ensemble')
+        résidus_GARCH = (self.indiv_predictions['GARCH'] - self.y)
+        tot_GARCH = sum(abs(résidus_GARCH))
+        axes[1,1].plot(x, résidus_GARCH, label=f'Résidus totaux:{tot_GARCH}')        
+        axes[1,1].set_title('Résidus modèle GARCH')
         axes[1,1].legend()
+
+        axes[2,0].plot(x, self.y, label='RV')
+        axes[2,0].plot(x, self.indiv_predictions['LSTM'], label='LSTM')
+        axes[2,0].set_title('Modèle LSTM')
+        axes[2,0].legend()
+
+        résidus_LSTM = (self.indiv_predictions['LSTM'] - self.y)
+        tot_LSTM = sum(abs(résidus_LSTM))
+        axes[2,1].plot(x, résidus_LSTM, label=f'Résidus totaux: {tot_LSTM}')        
+        axes[2,1].set_title('Résidus modèle LSTM')
+        axes[2,1].legend()
+        
+        axes[3,0].plot(x, self.y, label='RV')
+        axes[3,0].plot(x, self.predictions, label='Modèle d\'Ensemble')
+        axes[3,0].set_title('Modèle d\'Ensemble')
+        axes[3,0].legend()
+
+        résidus_E = (self.predictions - self.y)
+        tot_E = sum(abs(résidus_E))
+        axes[3,1].plot(x, résidus_E, label=f'Résidus totaux: {tot_E}')        
+        axes[3,1].set_title('Résidus modèle Ensemble')
+        axes[3,1].legend()
 
         plt.tight_layout()
         plt.show()
